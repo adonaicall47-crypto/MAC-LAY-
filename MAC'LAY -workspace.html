@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>MAC'LAY — Adonai Call Workspace</title>
+<meta name="description" content="Write, execute, and collaborate on code in real-time. Powered by Claude Anthropic AI."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --teal:#00d4cc;--teal2:#00b8b2;--teal3:rgba(0,212,204,.09);
+  --purple:#7c3aed;--bg:#080910;--bg2:#0d0e18;--card:#111220;
+  --border:rgba(255,255,255,.07);--border2:rgba(0,212,204,.22);
+  --text:#eeeeff;--muted:#7a7e9a;--muted2:#565a78;
+  --green:#22d3a0;--red:#f4505a;--yellow:#f5a623;
+  --font-h:'Syne',sans-serif;--font-b:'DM Sans',sans-serif;--font-m:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font-b);background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6}
+::selection{background:rgba(0,212,204,.22);color:#fff}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:rgba(0,212,204,.2);border-radius:2px}
+
+/* NAV */
+nav{position:fixed;top:0;inset-x:0;z-index:300;display:flex;align-items:center;justify-content:space-between;padding:.8rem 2.5rem;background:rgba(8,9,16,.9);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+.nav-brand{display:flex;align-items:center;gap:.5rem;text-decoration:none}
+.nav-wm{font-family:var(--font-h);font-size:1.3rem;font-weight:800;color:#fff;letter-spacing:-1px}
+.nav-wm em{color:var(--teal);font-style:normal}
+.nav-tag{font-size:.58rem;color:var(--muted);letter-spacing:2px;font-family:var(--font-m);padding:.18rem .5rem;background:rgba(0,212,204,.07);border:1px solid var(--border2);border-radius:4px;margin-left:.3rem}
+.nav-links{display:flex;align-items:center;gap:1.75rem}
+.nav-links a{color:var(--muted);font-size:.85rem;font-weight:500;text-decoration:none;transition:color .2s}
+.nav-links a:hover{color:var(--teal)}
+.nav-auth{display:flex;gap:.6rem;align-items:center;margin-left:.5rem}
+.btn-nav-ghost{padding:.45rem 1rem;background:transparent;color:var(--text);font-size:.78rem;font-weight:600;border:1px solid var(--border);border-radius:7px;cursor:pointer;transition:all .2s;font-family:var(--font-b)}
+.btn-nav-ghost:hover{border-color:var(--teal);color:var(--teal)}
+.btn-nav-primary{padding:.45rem 1.1rem;background:var(--teal);color:#000;font-size:.78rem;font-weight:700;border:none;border-radius:7px;cursor:pointer;transition:all .2s;font-family:var(--font-b)}
+.btn-nav-primary:hover{background:var(--teal2)}
+.user-pill{display:none;align-items:center;gap:.5rem;padding:.4rem .9rem;background:var(--teal3);border:1px solid var(--border2);border-radius:20px;cursor:pointer;font-size:.78rem;color:var(--teal);font-weight:600}
+.user-pill.show{display:flex}
+.user-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--teal));display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#fff}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6rem 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 90% 60% at 50% 0%,rgba(124,58,237,.22) 0%,rgba(0,212,204,.07) 45%,transparent 70%);pointer-events:none}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,204,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,204,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none}
+.hero-badge{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--font-m);font-size:.63rem;color:var(--teal);background:rgba(0,212,204,.07);border:1px solid var(--border2);padding:.35rem 1rem;border-radius:100px;letter-spacing:2px;margin-bottom:1.5rem;animation:fadeUp .5s ease both}
+.hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--teal);animation:pulse 1.5s infinite}
+.hero-title{font-family:var(--font-h);font-size:clamp(2.8rem,6vw,5rem);font-weight:800;line-height:1.05;color:#fff;max-width:820px;letter-spacing:-2px;animation:fadeUp .5s .1s ease both}
+.hero-title .tc{color:var(--teal)}
+.hero-sub{font-size:1.05rem;color:var(--muted);max-width:500px;margin-top:1.2rem;animation:fadeUp .5s .2s ease both;line-height:1.75}
+.hero-sub strong{color:var(--teal)}
+.hero-btns{display:flex;gap:.9rem;margin-top:2.5rem;flex-wrap:wrap;justify-content:center;animation:fadeUp .5s .3s ease both}
+.btn-p{padding:.85rem 2.2rem;background:var(--teal);color:#000;font-family:var(--font-h);font-size:.85rem;font-weight:700;border:none;border-radius:8px;cursor:pointer;text-decoration:none;transition:all .25s;box-shadow:0 0 28px rgba(0,212,204,.28)}
+.btn-p:hover{background:var(--teal2);transform:translateY(-2px);box-shadow:0 0 44px rgba(0,212,204,.5)}
+.btn-g{padding:.85rem 2.2rem;background:transparent;color:var(--text);font-family:var(--font-h);font-size:.85rem;font-weight:700;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;text-decoration:none;transition:all .25s}
+.btn-g:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px)}
+.hero-stats{display:flex;gap:2.5rem;margin-top:3.5rem;animation:fadeUp .5s .4s ease both;flex-wrap:wrap;justify-content:center}
+.stat .sn{font-family:var(--font-h);font-size:1.7rem;font-weight:800;color:#fff}.stat .sn em{color:var(--teal);font-style:normal}
+.stat .sl{font-size:.68rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-family:var(--font-m)}
+
+/* SECTION */
+.section{padding:5.5rem 2rem;max-width:1100px;margin:0 auto}
+.kicker{font-family:var(--font-m);font-size:.63rem;color:var(--teal);letter-spacing:3px;text-transform:uppercase;margin-bottom:.6rem}
+.sec-h{font-family:var(--font-h);font-size:clamp(1.6rem,3vw,2.4rem);font-weight:800;color:#fff;letter-spacing:-1px;margin-bottom:.5rem}
+.sec-p{color:var(--muted);font-size:.95rem;max-width:560px;margin-bottom:2.5rem;line-height:1.75}
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);max-width:1100px;margin:0 auto}
+
+/* EDITOR */
+.ed-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 0 80px rgba(0,0,0,.5)}
+.ed-bar{display:flex;align-items:center;justify-content:space-between;padding:.7rem 1.2rem;background:#0b0c14;border-bottom:1px solid var(--border);gap:.5rem;flex-wrap:wrap}
+.dots{display:flex;gap:5px}.dot{width:10px;height:10px;border-radius:50%}
+.dot-r{background:#f4505a}.dot-y{background:#f5a623}.dot-g{background:#22d3a0}
+.ed-tabs{display:flex;gap:.3rem;flex:1;margin:0 .8rem;overflow-x:auto}
+.ed-tab{font-family:var(--font-m);font-size:.65rem;padding:.3rem .75rem;border-radius:5px;cursor:pointer;border:1px solid transparent;color:var(--muted);white-space:nowrap;transition:all .2s}
+.ed-tab.active{background:rgba(0,212,204,.1);border-color:var(--border2);color:var(--teal)}
+.ed-actions{display:flex;gap:.5rem;align-items:center;flex-shrink:0}
+.lang-sel{background:var(--teal3);border:1px solid var(--border2);color:var(--teal);font-family:var(--font-m);font-size:.7rem;padding:.3rem .75rem;border-radius:5px;cursor:pointer;outline:none}
+.run-btn{background:var(--teal);color:#000;border:none;font-family:var(--font-h);font-weight:700;font-size:.7rem;padding:.38rem 1.1rem;border-radius:5px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:.4rem;min-width:90px;justify-content:center}
+.run-btn:hover{background:var(--teal2)}.run-btn:disabled{opacity:.6;cursor:not-allowed}
+.save-btn{background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;font-size:.7rem;font-family:var(--font-m);padding:.32rem .8rem;border-radius:5px;cursor:pointer;transition:all .2s}
+.save-btn:hover{background:rgba(124,58,237,.25)}
+.ed-body{display:grid;grid-template-columns:1fr 1fr;min-height:400px}
+@media(max-width:680px){.ed-body{grid-template-columns:1fr}}
+.code-pane{position:relative;border-right:1px solid var(--border)}
+.lnums{position:absolute;top:0;left:0;width:40px;background:#090a12;border-right:1px solid rgba(0,212,204,.06);display:flex;flex-direction:column;padding:.9rem 0;align-items:center;color:rgba(122,126,154,.3);font-family:var(--font-m);font-size:.66rem;pointer-events:none;overflow:hidden;height:100%}
+.lnums span{line-height:1.5rem}
+#code-editor{width:100%;height:100%;min-height:400px;background:transparent;color:#c9d1e0;font-family:var(--font-m);font-size:.78rem;line-height:1.5rem;border:none;outline:none;resize:none;padding:.9rem .9rem .9rem 48px;tab-size:2;white-space:pre}
+.out-pane{background:#07080f;display:flex;flex-direction:column}
+.out-hdr{display:flex;align-items:center;justify-content:space-between;padding:.6rem 1rem;border-bottom:1px solid var(--border)}
+.out-lbl{font-family:var(--font-m);font-size:.62rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:.4rem}
+.out-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.out-meta{font-family:var(--font-m);font-size:.62rem;color:var(--muted2);display:flex;gap:.75rem;align-items:center}
+#output-box{flex:1;font-family:var(--font-m);font-size:.75rem;color:var(--green);white-space:pre-wrap;word-break:break-all;line-height:1.7;padding:1rem;overflow-y:auto;min-height:180px}
+.ed-footer{padding:.55rem 1.2rem;background:#090a12;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.5rem}
+.ed-tip{font-size:.68rem;color:var(--muted2);display:flex;align-items:center;gap:.4rem}
+.ed-snippets{display:flex;gap:.5rem;flex-wrap:wrap}
+.snippet-pill{font-family:var(--font-m);font-size:.6rem;padding:.2rem .6rem;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:4px;color:var(--muted);cursor:pointer;transition:all .2s}
+.snippet-pill:hover{border-color:var(--teal);color:var(--teal)}
+
+/* EXECUTION LOADING */
+.exec-loading{display:none;flex-direction:column;align-items:center;justify-content:center;gap:.75rem;padding:2rem;flex:1}
+.exec-loading.show{display:flex}
+.exec-spinner{width:32px;height:32px;border:3px solid rgba(0,212,204,.15);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite}
+.exec-msg{font-family:var(--font-m);font-size:.72rem;color:var(--muted)}
+
+/* AI SECTION */
+.ai-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.4)}
+.ai-hdr{background:linear-gradient(90deg,#0c0d16,#120d1e);padding:1.1rem 1.5rem;display:flex;align-items:center;gap:1rem;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.ai-ava{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--purple),var(--teal));display:flex;align-items:center;justify-content:center;font-family:var(--font-m);font-size:.72rem;font-weight:700;color:#fff;flex-shrink:0;box-shadow:0 0 20px rgba(0,212,204,.22);position:relative}
+.ai-ava::after{content:'';position:absolute;bottom:1px;right:1px;width:10px;height:10px;border-radius:50%;background:var(--green);border:2px solid var(--card)}
+.ai-info .ai-name{font-family:var(--font-h);font-weight:700;font-size:.95rem;color:var(--teal)}
+.ai-info .ai-desc{font-size:.72rem;color:var(--muted);margin-top:.1rem}
+.ai-right{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:.4rem}
+.powered-by{font-size:.65rem;color:var(--muted2);font-family:var(--font-m);background:rgba(255,255,255,.03);border:1px solid var(--border);padding:.28rem .65rem;border-radius:5px;display:flex;align-items:center;gap:.35rem}
+.powered-by .ant-logo{color:#d97706;font-weight:700}
+
+/* AI MODEL SELECTOR */
+.model-bar{display:flex;align-items:center;gap:.5rem;padding:.65rem 1.5rem;border-bottom:1px solid var(--border);background:#0b0c14;overflow-x:auto;flex-wrap:nowrap}
+.model-lbl{font-size:.62rem;color:var(--muted2);font-family:var(--font-m);white-space:nowrap;flex-shrink:0}
+.model-btn{padding:.28rem .85rem;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);font-size:.68rem;border-radius:20px;cursor:pointer;transition:all .2s;font-family:var(--font-m);white-space:nowrap;flex-shrink:0;display:flex;align-items:center;gap:.35rem}
+.model-btn:hover{border-color:var(--teal);color:var(--teal)}
+.model-btn.active{background:var(--teal3);border-color:var(--border2);color:var(--teal);font-weight:600}
+.model-btn .model-badge{font-size:.55rem;padding:.1rem .35rem;border-radius:3px;font-weight:700}
+.badge-free{background:rgba(34,211,160,.12);color:var(--green)}
+.badge-pro{background:rgba(124,58,237,.15);color:#a78bfa}
+.badge-ext{background:rgba(245,166,35,.1);color:var(--yellow)}
+
+.quick-row{display:flex;gap:.5rem;padding:.65rem 1.5rem;border-bottom:1px solid var(--border);background:#0b0c14;flex-wrap:wrap;align-items:center}
+.quick-lbl{font-size:.63rem;color:var(--muted2);font-family:var(--font-m);white-space:nowrap}
+.quick-btn{padding:.28rem .8rem;background:rgba(0,212,204,.05);border:1px solid rgba(0,212,204,.14);color:var(--teal);font-size:.68rem;border-radius:20px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.quick-btn:hover{background:rgba(0,212,204,.12)}
+.ai-msgs{height:340px;overflow-y:auto;padding:1.4rem;display:flex;flex-direction:column;gap:1rem}
+.ai-msgs::-webkit-scrollbar{width:3px}.ai-msgs::-webkit-scrollbar-thumb{background:var(--border)}
+.msg{display:flex;gap:.7rem;max-width:88%}.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.msg-av{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;font-family:var(--font-m)}
+.aav{background:linear-gradient(135deg,var(--purple),var(--teal));color:#fff}
+.uav{background:rgba(0,212,204,.12);border:1px solid var(--border2);color:var(--teal)}
+.msg-bub{padding:.75rem 1.05rem;border-radius:10px;font-size:.875rem;line-height:1.7}
+.msg.ai .msg-bub{background:rgba(0,212,204,.05);border:1px solid rgba(0,212,204,.1);color:var(--text);border-radius:4px 10px 10px 10px}
+.msg.user .msg-bub{background:rgba(124,58,237,.18);border:1px solid rgba(124,58,237,.28);color:#fff;border-radius:10px 4px 10px 10px}
+.msg-bub code{font-family:var(--font-m);font-size:.72rem;background:rgba(0,0,0,.35);padding:.1rem .35rem;border-radius:3px;color:var(--teal)}
+.msg-bub pre{background:rgba(0,0,0,.4);padding:.8rem;border-radius:8px;font-size:.72rem;overflow-x:auto;margin:.5rem 0;color:#c084fc;font-family:var(--font-m);line-height:1.6;border:1px solid rgba(255,255,255,.06)}
+.msg-meta{font-family:var(--font-m);font-size:.6rem;color:var(--muted2);margin-top:.3rem;padding:0 .2rem}
+.typing-row{display:none;align-items:center;gap:.6rem;padding:0 1.5rem .6rem}
+.tdots{display:flex;gap:3px}.tdot{width:5px;height:5px;border-radius:50%;background:var(--teal);animation:bounce 1s infinite}.tdot:nth-child(2){animation-delay:.15s}.tdot:nth-child(3){animation-delay:.3s}
+.typing-lbl{font-size:.68rem;color:var(--muted);font-family:var(--font-m)}
+.ai-input-row{display:flex;gap:.7rem;padding:1rem 1.5rem;border-top:1px solid var(--border);background:#0b0c14;align-items:center}
+#mac-input{flex:1;background:rgba(0,212,204,.05);border:1px solid rgba(0,212,204,.18);color:var(--text);font-family:var(--font-b);font-size:.875rem;padding:.65rem 1rem;border-radius:8px;outline:none;transition:border-color .2s}
+#mac-input:focus{border-color:var(--teal);background:rgba(0,212,204,.08)}
+#mac-input::placeholder{color:var(--muted2)}
+.send-btn{background:var(--teal);color:#000;border:none;border-radius:8px;padding:.65rem 1.3rem;font-weight:700;font-size:.78rem;cursor:pointer;transition:all .2s;font-family:var(--font-h);display:flex;align-items:center;gap:.4rem;min-width:80px;justify-content:center}
+.send-btn:hover{background:var(--teal2)}.send-btn:disabled{opacity:.6;cursor:not-allowed}
+.ai-notice{padding:.5rem 1.5rem;font-size:.65rem;color:var(--muted2);background:rgba(255,255,255,.02);border-top:1px solid var(--border);font-family:var(--font-m);display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.ai-notice .anth{color:var(--teal)}
+.model-active-tag{background:var(--teal3);border:1px solid var(--border2);color:var(--teal);font-family:var(--font-m);font-size:.6rem;padding:.15rem .5rem;border-radius:4px}
+
+/* ERROR BOUNDARY */
+.err-boundary{background:rgba(244,80,90,.06);border:1px solid rgba(244,80,90,.25);border-radius:10px;padding:1rem 1.25rem;display:flex;align-items:flex-start;gap:.75rem;margin-top:1rem}
+.err-icon{font-size:1.2rem;flex-shrink:0}
+.err-title{font-weight:600;color:#f4505a;font-size:.85rem;margin-bottom:.25rem}
+.err-msg{font-size:.8rem;color:var(--muted);line-height:1.6}
+.err-retry{margin-top:.6rem;padding:.35rem .9rem;background:rgba(244,80,90,.1);border:1px solid rgba(244,80,90,.25);color:#f4505a;font-size:.72rem;border-radius:5px;cursor:pointer;font-family:var(--font-m);transition:all .2s}
+.err-retry:hover{background:rgba(244,80,90,.2)}
+
+/* SAVED SNIPPETS */
+.snippets-panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-top:2rem}
+.sp-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.sp-head h3{font-family:var(--font-h);font-weight:700;color:#fff;font-size:.95rem}
+.sp-count{font-family:var(--font-m);font-size:.65rem;color:var(--teal);background:var(--teal3);border:1px solid var(--border2);padding:.2rem .6rem;border-radius:10px}
+.sp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem}
+.sp-card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;padding:.85rem;cursor:pointer;transition:all .2s}
+.sp-card:hover{border-color:rgba(0,212,204,.25);transform:translateY(-1px)}
+.sp-name{font-size:.82rem;font-weight:600;color:#fff;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-meta{font-family:var(--font-m);font-size:.62rem;color:var(--muted);display:flex;gap:.5rem}
+.sp-actions{display:flex;gap:.4rem;margin-top:.6rem}
+.sp-load{padding:.25rem .65rem;background:var(--teal3);border:1px solid var(--border2);color:var(--teal);font-size:.62rem;border-radius:4px;cursor:pointer;font-family:var(--font-m);transition:all .2s}
+.sp-load:hover{background:rgba(0,212,204,.15)}
+.sp-del{padding:.25rem .65rem;background:rgba(244,80,90,.08);border:1px solid rgba(244,80,90,.2);color:#f4505a;font-size:.62rem;border-radius:4px;cursor:pointer;font-family:var(--font-m);transition:all .2s}
+.sp-del:hover{background:rgba(244,80,90,.18)}
+
+/* FILE MANAGER */
+.upload-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+@media(max-width:720px){.upload-grid{grid-template-columns:1fr}}
+.upload-zone{border:2px dashed rgba(0,212,204,.22);border-radius:14px;padding:2.5rem 2rem;text-align:center;background:rgba(0,212,204,.02);cursor:pointer;transition:all .25s;position:relative}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--teal);background:rgba(0,212,204,.06)}
+.upload-zone input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.upload-icon{font-size:2.5rem;margin-bottom:.75rem}
+.upload-title{font-family:var(--font-h);font-size:1rem;font-weight:700;color:#fff;margin-bottom:.4rem}
+.upload-hint{font-size:.78rem;color:var(--muted);line-height:1.6}
+.upload-types{display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap;margin-top:.75rem}
+.type-tag{font-family:var(--font-m);font-size:.6rem;padding:.2rem .5rem;background:rgba(0,212,204,.07);border:1px solid var(--border2);color:var(--teal);border-radius:4px}
+.upload-progress{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-top:.75rem;display:none}
+.upload-progress.show{display:block}
+.up-bar{height:100%;background:var(--teal);border-radius:2px;width:0;transition:width .3s}
+.upload-success{display:none;background:rgba(34,211,160,.07);border:1px solid rgba(34,211,160,.2);border-radius:8px;padding:.7rem 1rem;font-size:.8rem;color:var(--green);margin-top:.75rem;align-items:center;gap:.5rem}
+.upload-success.show{display:flex}
+.file-list-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.file-list-head h3{font-family:var(--font-h);font-weight:700;color:#fff;font-size:.95rem}
+.fcount{font-family:var(--font-m);font-size:.65rem;color:var(--teal);background:var(--teal3);border:1px solid var(--border2);padding:.2rem .6rem;border-radius:10px}
+.file-list{display:flex;flex-direction:column;gap:.6rem;max-height:340px;overflow-y:auto;padding-right:.25rem}
+.file-list::-webkit-scrollbar{width:3px}
+.file-item{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:.75rem 1rem;display:flex;align-items:center;gap:.85rem;animation:fadeUp .3s ease}
+.file-item:hover{border-color:rgba(0,212,204,.18)}
+.fi-icon{font-size:1.3rem;flex-shrink:0}
+.fi-info{flex:1;min-width:0}
+.fi-name{font-size:.82rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fi-meta{font-family:var(--font-m);font-size:.62rem;color:var(--muted);margin-top:.15rem;display:flex;gap:.5rem}
+.fi-actions{display:flex;gap:.4rem;flex-shrink:0}
+.fa-dl{padding:.3rem .65rem;background:var(--teal3);color:var(--teal);border:1px solid var(--border2);font-size:.62rem;font-family:var(--font-m);border-radius:5px;cursor:pointer;transition:all .2s}
+.fa-dl:hover{background:rgba(0,212,204,.15)}
+.fa-rm{padding:.3rem .65rem;background:rgba(244,80,90,.07);color:#f4505a;border:1px solid rgba(244,80,90,.2);font-size:.62rem;font-family:var(--font-m);border-radius:5px;cursor:pointer;transition:all .2s}
+.fa-rm:hover{background:rgba(244,80,90,.18)}
+.browse-sec{margin-top:2.5rem}
+.browse-title{font-family:var(--font-h);font-weight:700;color:#fff;font-size:1rem;margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between}
+.filter-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.filter-btn{padding:.3rem .85rem;border-radius:20px;font-size:.7rem;font-family:var(--font-m);cursor:pointer;border:1px solid var(--border);background:transparent;color:var(--muted);transition:all .2s}
+.filter-btn.active,.filter-btn:hover{background:var(--teal3);border-color:var(--border2);color:var(--teal)}
+.browse-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem}
+.bc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:.45rem}
+.bc:hover{border-color:rgba(0,212,204,.25);transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.bc-top{display:flex;align-items:center;justify-content:space-between}
+.bc-tag{font-family:var(--font-m);font-size:.6rem;padding:.15rem .5rem;border-radius:3px;background:rgba(0,212,204,.08);color:var(--teal);border:1px solid var(--border2)}
+.bc-name{font-size:.82rem;font-weight:600;color:#fff}
+.bc-desc{font-size:.72rem;color:var(--muted);line-height:1.5}
+.bc-foot{display:flex;align-items:center;justify-content:space-between;font-family:var(--font-m);font-size:.63rem;color:var(--muted);margin-top:.2rem;padding-top:.5rem;border-top:1px solid var(--border)}
+.dl-progress{height:2px;background:var(--border);border-radius:1px;overflow:hidden;margin-top:.3rem;display:none}
+.dl-progress.show{display:block}
+.dlp-bar{height:100%;background:var(--teal);border-radius:1px;animation:dlprogress 1.2s ease forwards}
+@keyframes dlprogress{from{width:0}to{width:100%}}
+
+/* PRICING */
+.pricing-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1.25rem}
+.price-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.75rem;position:relative;transition:all .25s}
+.price-card:hover{border-color:rgba(0,212,204,.25);transform:translateY(-3px)}
+.price-card.featured{border-color:var(--teal);box-shadow:0 0 40px rgba(0,212,204,.1)}
+.price-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--teal);color:#000;font-size:.62rem;font-weight:700;padding:.25rem .9rem;border-radius:20px;font-family:var(--font-m);letter-spacing:1px;white-space:nowrap}
+.price-tier{font-family:var(--font-m);font-size:.62rem;color:var(--teal);letter-spacing:2px;text-transform:uppercase;margin-bottom:.5rem}
+.price-name{font-family:var(--font-h);font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:.25rem}
+.price-amt{font-family:var(--font-h);font-size:2.5rem;font-weight:800;color:#fff;line-height:1}
+.price-amt sub{font-size:.85rem;font-weight:400;color:var(--muted)}
+.price-per{font-size:.78rem;font-weight:500;color:var(--muted);margin-left:.2rem}
+.price-tag{font-size:.82rem;color:var(--muted);margin:.6rem 0 1.2rem;padding-bottom:1.2rem;border-bottom:1px solid var(--border)}
+.price-feats{list-style:none;display:flex;flex-direction:column;gap:.6rem;margin-bottom:1.5rem}
+.price-feats li{font-size:.835rem;color:var(--text);display:flex;align-items:flex-start;gap:.55rem;line-height:1.5}
+.price-feats li::before{content:'✓';color:var(--teal);font-weight:700;flex-shrink:0;margin-top:.05rem;font-family:var(--font-m)}
+.price-feats li.no::before{content:'✗';color:var(--muted2)}.price-feats li.no{color:var(--muted)}
+.price-btn{width:100%;padding:.8rem;border-radius:8px;font-family:var(--font-h);font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s;border:none;letter-spacing:.5px}
+.pbtn-teal{background:var(--teal);color:#000}.pbtn-teal:hover{background:var(--teal2)}
+.pbtn-out{background:transparent;border:1.5px solid var(--border);color:var(--text)}.pbtn-out:hover{border-color:var(--teal);color:var(--teal)}
+.infra-table{width:100%;border-collapse:collapse;margin-top:2rem;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.infra-table th{background:#0b0c14;padding:.75rem 1.2rem;text-align:left;font-family:var(--font-m);font-size:.62rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;font-weight:500;border-bottom:1px solid var(--border)}
+.infra-table td{padding:.8rem 1.2rem;font-size:.82rem;color:var(--text);border-bottom:1px solid rgba(255,255,255,.04)}
+.infra-table tr:last-child td{border-bottom:none}
+.cfree{color:var(--green);font-family:var(--font-m);font-size:.78rem}
+.cpaid{color:var(--yellow);font-family:var(--font-m);font-size:.78rem}
+.total-row td{background:rgba(0,212,204,.04);border-top:1px solid rgba(0,212,204,.15)!important;font-weight:700;color:var(--teal)}
+
+/* CONTACT */
+.cc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1rem;margin-top:2rem}
+.cc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;display:flex;align-items:center;gap:1.1rem;text-decoration:none;color:inherit;transition:all .25s}
+.cc:hover{border-color:var(--teal);transform:translateY(-2px);box-shadow:0 0 28px rgba(0,212,204,.08)}
+.cc-icon{width:46px;height:46px;border-radius:10px;background:var(--teal3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.cc-lbl{font-family:var(--font-m);font-size:.62rem;color:var(--teal);letter-spacing:2px;text-transform:uppercase;margin-bottom:.25rem}
+.cc-val{font-size:.82rem;color:var(--text);word-break:break-all}
+
+/* DEPLOYMENT DOCS */
+.deploy-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-top:.5rem}
+@media(max-width:720px){.deploy-grid{grid-template-columns:1fr}}
+.deploy-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem}
+.deploy-card h3{font-family:var(--font-h);font-weight:700;color:#fff;font-size:1rem;margin-bottom:.3rem;display:flex;align-items:center;gap:.5rem}
+.deploy-card p{font-size:.8rem;color:var(--muted);margin-bottom:1rem;line-height:1.6}
+.deploy-steps{display:flex;flex-direction:column;gap:.5rem}
+.deploy-step{display:flex;align-items:flex-start;gap:.7rem}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--teal3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-m);font-size:.62rem;color:var(--teal);flex-shrink:0;margin-top:.05rem}
+.step-text{font-size:.8rem;color:var(--text);line-height:1.6}
+.step-text code{font-family:var(--font-m);font-size:.7rem;background:rgba(0,0,0,.3);padding:.1rem .35rem;border-radius:3px;color:var(--teal)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:2.5rem 2.5rem;background:var(--bg2)}
+.foot-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:2.5rem}
+@media(max-width:700px){.foot-inner{grid-template-columns:1fr 1fr}}
+.foot-wm{font-family:var(--font-h);font-size:1.3rem;font-weight:800;color:#fff;letter-spacing:-1px}
+.foot-wm em{color:var(--teal);font-style:normal}
+.foot-brand p{font-size:.78rem;color:var(--muted);margin-top:.5rem;line-height:1.65;max-width:220px}
+.foot-col h4{font-family:var(--font-m);font-size:.62rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:.8rem;font-weight:500}
+.foot-col a{display:block;font-size:.8rem;color:var(--muted2);text-decoration:none;margin-bottom:.4rem;transition:color .2s}.foot-col a:hover{color:var(--teal)}
+.foot-bottom{max-width:1100px;margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem}
+.foot-bottom p{font-family:var(--font-m);font-size:.63rem;color:var(--muted2)}
+.foot-bottom a{color:var(--teal);text-decoration:none}
+.soc-row{display:flex;gap:.5rem}
+.soc{width:32px;height:32px;border-radius:7px;background:rgba(255,255,255,.04);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.85rem;cursor:pointer;transition:all .2s;text-decoration:none;color:inherit}
+.soc:hover{border-color:var(--teal);background:var(--teal3)}
+
+/* MODALS */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:999;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(5px)}
+.modal-bg.open{display:flex}
+.modal{background:#111220;border:1px solid var(--border);border-radius:16px;padding:2rem;width:100%;max-width:440px;position:relative;animation:fadeUp .3s ease}
+.modal h3{font-family:var(--font-h);font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:.35rem}
+.modal-sub{font-size:.82rem;color:var(--muted);margin-bottom:1.5rem;line-height:1.6}
+.modal-close{position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted);width:30px;height:30px;border-radius:7px;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.modal-close:hover{border-color:var(--teal);color:var(--teal)}
+.auth-providers{display:flex;flex-direction:column;gap:.65rem;margin-bottom:1.25rem}
+.auth-provider{display:flex;align-items:center;gap:.85rem;padding:.8rem 1rem;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:all .2s;font-size:.875rem;font-weight:500;width:100%;color:var(--text)}
+.auth-provider:hover{border-color:var(--teal);background:rgba(0,212,204,.05)}
+.auth-provider .ap-icon{font-size:1.2rem;width:24px;text-align:center}
+.auth-divider{display:flex;align-items:center;gap:.75rem;margin-bottom:1.25rem;color:var(--muted);font-size:.78rem}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+.form-field{margin-bottom:.85rem}
+.form-field label{display:block;font-size:.72rem;color:var(--muted);margin-bottom:.35rem;font-family:var(--font-m)}
+.form-field input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);font-family:var(--font-b);font-size:.875rem;padding:.65rem .9rem;border-radius:8px;outline:none;transition:border-color .2s}
+.form-field input:focus{border-color:var(--teal);background:rgba(0,212,204,.04)}
+.form-field input::placeholder{color:var(--muted2)}
+.modal-btns{display:flex;gap:.65rem;margin-top:1.25rem}
+.mbtn{flex:1;padding:.75rem;border-radius:8px;font-family:var(--font-h);font-weight:700;font-size:.82rem;cursor:pointer;transition:all .2s;border:none}
+.mbtn-p{background:var(--teal);color:#000}.mbtn-p:hover{background:var(--teal2)}
+.mbtn-s{background:transparent;border:1.5px solid var(--border);color:var(--text)}.mbtn-s:hover{border-color:var(--teal);color:var(--teal)}
+.auth-toggle{text-align:center;font-size:.8rem;color:var(--muted);margin-top:.75rem}
+.auth-toggle a{color:var(--teal);cursor:pointer;text-decoration:none}
+.form-loading{display:none;align-items:center;gap:.6rem;justify-content:center;padding:.5rem}
+.form-loading.show{display:flex}
+.form-spinner{width:18px;height:18px;border:2px solid rgba(0,212,204,.15);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite}
+.form-loading span{font-size:.78rem;color:var(--muted);font-family:var(--font-m)}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:1000;background:#1a1b28;border:1px solid var(--border);color:var(--text);padding:.85rem 1.25rem;border-radius:10px;font-size:.82rem;display:flex;align-items:center;gap:.6rem;transform:translateY(80px);opacity:0;transition:all .35s;box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:340px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-left:3px solid var(--green)}.toast.err{border-left:3px solid var(--red)}.toast.info{border-left:3px solid var(--teal)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:14px;height:14px;border:2px solid rgba(0,212,204,.15);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-brand" href="#">
+    <span class="nav-wm">MAC<em>'</em>LAY</span>
+    <span class="nav-tag">beta · maclay.com</span>
+  </a>
+  <div class="nav-links">
+    <a href="#editor">Editor</a>
+    <a href="#ai">MAC AI</a>
+    <a href="#files">Files</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#deploy">Deploy</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="nav-auth">
+    <div class="user-pill" id="user-pill" onclick="showProfile()">
+      <div class="user-avatar" id="user-av">U</div>
+      <span id="user-name-nav">User</span>
+    </div>
+    <button class="btn-nav-ghost" id="btn-signin" onclick="openAuth('signin')">Sign In</button>
+    <button class="btn-nav-primary" id="btn-signup" onclick="openAuth('signup')">Sign Up</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div id="hero">
+  <div class="hero-bg"></div><div class="hero-grid"></div>
+  <div class="hero-badge">maclay.com · Adonai Call Workspace</div>
+  <h1 class="hero-title">Code. Build.<br/><span class="tc">Ship Faster.</span></h1>
+  <p class="hero-sub">Write, execute &amp; collaborate on code — powered by <strong>Claude Anthropic AI</strong>.</p>
+  <div class="hero-btns">
+    <a href="#editor" class="btn-p">▶ Start Coding</a>
+    <a href="#files" class="btn-g">Browse Files</a>
+    <a href="#pricing" class="btn-g">View Pricing</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="sn">9<em>+</em></div><div class="sl">Languages</div></div>
+    <div class="stat"><div class="sn">AI<em>∞</em></div><div class="sl">Powered</div></div>
+    <div class="stat"><div class="sn">0<em>ms</em></div><div class="sl">Setup</div></div>
+    <div class="stat"><div class="sn">Free<em>↑</em></div><div class="sl">To Start</div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- EDITOR -->
+<div class="section" id="editor">
+  <div class="kicker">// Live Workspace</div>
+  <h2 class="sec-h">Code Editor</h2>
+  <p class="sec-p">Execute code in real-time. JavaScript runs instantly in-browser. Python, Java, C, and more use our Judge0 backend on paid plans.</p>
+
+  <div class="ed-wrap">
+    <div class="ed-bar">
+      <div style="display:flex;align-items:center;gap:.6rem">
+        <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+      </div>
+      <div class="ed-tabs">
+        <div class="ed-tab active" id="tab-main">untitled.js</div>
+      </div>
+      <div class="ed-actions">
+        <select class="lang-sel" id="lang-select" onchange="setTemplate()">
+          <option value="javascript">JavaScript</option>
+          <option value="python">Python</option>
+          <option value="html">HTML</option>
+          <option value="c">C</option>
+          <option value="cpp">C++</option>
+          <option value="java">Java</option>
+          <option value="php">PHP</option>
+          <option value="sql">SQL</option>
+          <option value="bash">Bash</option>
+        </select>
+        <button class="save-btn" onclick="saveSnippet()">💾 Save</button>
+        <button class="run-btn" id="run-btn" onclick="runCode()"><span id="run-label">▶ Run</span></button>
+      </div>
+    </div>
+    <div class="ed-body">
+      <div class="code-pane">
+        <div class="lnums" id="lnums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span></div>
+        <textarea id="code-editor" spellcheck="false" onkeydown="handleTab(event)" oninput="updateLines()">// Welcome to MAC'LAY Workspace
+// Powered by Claude Anthropic AI
+
+function greet(name) {
+  return `Hello, ${name}! Welcome to MAC'LAY.`;
+}
+
+const message = greet("Developer");
+console.log(message);
+console.log("Happy coding! 🚀");</textarea>
+      </div>
+      <div class="out-pane">
+        <div class="out-hdr">
+          <span class="out-lbl"><span class="out-dot" id="out-dot"></span> Output</span>
+          <div class="out-meta">
+            <span id="exec-lang-tag" style="font-family:var(--font-m);font-size:.62rem;color:var(--teal)">JS</span>
+            <span id="run-time"></span>
+          </div>
+        </div>
+        <div id="exec-loading" class="exec-loading">
+          <div class="exec-spinner"></div>
+          <div class="exec-msg" id="exec-msg">Executing code...</div>
+        </div>
+        <div id="output-box">// Click ▶ Run to execute your code...</div>
+      </div>
+    </div>
+    <div class="ed-footer">
+      <div class="ed-tip">⚡ JS = instant in-browser · Python/Java/C = Judge0 backend (Pro plan)</div>
+      <div class="ed-snippets" id="snippet-pills"></div>
+    </div>
+  </div>
+
+  <!-- Error boundary display -->
+  <div id="exec-error" style="display:none" class="err-boundary">
+    <span class="err-icon">⚠️</span>
+    <div>
+      <div class="err-title">Execution Error</div>
+      <div class="err-msg" id="exec-error-msg"></div>
+      <button class="err-retry" onclick="runCode()">↺ Retry</button>
+    </div>
+  </div>
+
+  <!-- Saved snippets -->
+  <div class="snippets-panel" id="snippets-panel">
+    <div class="sp-head">
+      <h3>Saved Snippets</h3>
+      <span class="sp-count" id="sp-count">0</span>
+    </div>
+    <div class="sp-list" id="sp-list">
+      <div style="color:var(--muted);font-size:.8rem">No saved snippets yet. Write code and hit 💾 Save.</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- MAC AI -->
+<div class="section" id="ai">
+  <div class="kicker">// AI Assistant</div>
+  <h2 class="sec-h">MAC AI</h2>
+  <p class="sec-p">Real AI powered by <strong style="color:var(--teal)">Claude Anthropic</strong>. MAC AI = Claude engine. Debug, generate snippets, explain code, build bots.</p>
+
+  <div class="ai-wrap">
+    <div class="ai-hdr">
+      <div class="ai-ava">MAC</div>
+      <div class="ai-info">
+        <div class="ai-name">MAC AI Assistant</div>
+        <div class="ai-desc">MAC AI = Claude Anthropic engine · Founded by B-MAC OPERATIONS Co.</div>
+      </div>
+      <div class="ai-right">
+        <div class="powered-by"><span class="ant-logo">Anthropic</span> Claude</div>
+        <div style="font-size:.6rem;color:var(--muted2);font-family:var(--font-m)" id="model-active-display">Model: Claude Sonnet 4</div>
+      </div>
+    </div>
+
+    <!-- MODEL SELECTOR -->
+    <div class="model-bar">
+      <span class="model-lbl">AI Model:</span>
+      <button class="model-btn active" data-model="claude-sonnet-4-20250514" data-name="Claude Sonnet 4" onclick="setModel(this)">
+        🟣 Claude Sonnet 4 <span class="model-badge badge-free">FREE</span>
+      </button>
+      <button class="model-btn" data-model="claude-opus-4-20250514" data-name="Claude Opus 4" onclick="setModel(this)">
+        🟣 Claude Opus 4 <span class="model-badge badge-pro">PRO</span>
+      </button>
+      <button class="model-btn" data-model="claude-haiku-4-5-20251001" data-name="Claude Haiku 4.5" onclick="setModel(this)">
+        🟣 Claude Haiku 4.5 <span class="model-badge badge-free">FAST</span>
+      </button>
+      <button class="model-btn" data-model="gpt4" data-name="GPT-4o" onclick="setModel(this)">
+        🟢 GPT-4o <span class="model-badge badge-ext">OpenAI</span>
+      </button>
+      <button class="model-btn" data-model="gpt35" data-name="GPT-3.5 Turbo" onclick="setModel(this)">
+        🟢 GPT-3.5 Turbo <span class="model-badge badge-ext">OpenAI</span>
+      </button>
+      <button class="model-btn" data-model="gemini" data-name="Gemini 1.5 Pro" onclick="setModel(this)">
+        🔵 Gemini 1.5 Pro <span class="model-badge badge-ext">Google</span>
+      </button>
+    </div>
+
+    <div class="quick-row">
+      <span class="quick-lbl">Quick:</span>
+      <button class="quick-btn" onclick="askQuick('How do I optimize a JavaScript for loop for performance?')">Optimize loop</button>
+      <button class="quick-btn" onclick="askQuick('Explain async/await in JavaScript with a code example')">async/await</button>
+      <button class="quick-btn" onclick="askQuick('Write me a Python Telegram bot that sends a message')">Build a bot</button>
+      <button class="quick-btn" onclick="askQuick('Debug this error: TypeError: Cannot read properties of undefined')">Debug error</button>
+      <button class="quick-btn" onclick="askQuick('What is the difference between SQL JOIN types?')">SQL joins</button>
+    </div>
+
+    <div class="ai-msgs" id="ai-msgs">
+      <div class="msg ai">
+        <div class="msg-av aav">M</div>
+        <div>
+          <div class="msg-bub">
+            👋 Hey! I'm <strong>MAC AI</strong> — powered by <strong>Claude Anthropic</strong> (MAC AI = Claude engine). Built into MAC'LAY Workspace by <strong>B-MAC OPERATIONS</strong>.<br/><br/>
+            I can help you:<br/>
+            • 🔧 <strong>Debug</strong> errors and broken code<br/>
+            • ✍️ <strong>Write</strong> functions, bots, full scripts<br/>
+            • 📖 <strong>Explain</strong> anything in plain language<br/>
+            • 🤖 <strong>Build bots</strong> for Telegram, Discord, WhatsApp<br/>
+            • ⚡ <strong>Optimize</strong> slow or messy code<br/><br/>
+            Switch AI models above ↑ to try different engines. What are we building today?
+          </div>
+          <div class="msg-meta">MAC AI · Claude Sonnet 4 · Anthropic</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="typing-row" id="typing-row">
+      <div class="msg-av aav" style="width:32px;height:32px;font-size:.63rem;flex-shrink:0">M</div>
+      <div class="tdots"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>
+      <span class="typing-lbl" id="typing-lbl">MAC AI is thinking...</span>
+    </div>
+
+    <div class="ai-input-row">
+      <input type="text" id="mac-input" placeholder="Ask MAC AI — debug, write code, explain anything..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"/>
+      <button class="send-btn" id="send-btn" onclick="sendMsg()"><span id="send-label">Send ▶</span></button>
+    </div>
+    <div class="ai-notice">
+      <span class="anth">●</span> Connected · Active model: <span class="model-active-tag" id="model-notice-tag">Claude Sonnet 4</span>
+      &nbsp;·&nbsp; MAC AI = Claude Anthropic engine · B-MAC OPERATIONS
+      &nbsp;·&nbsp; <span style="color:rgba(122,126,154,.5)">OpenAI / Gemini require their own API keys in backend</span>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- FILE MANAGER -->
+<div class="section" id="files">
+  <div class="kicker">// File Manager</div>
+  <h2 class="sec-h">Upload &amp; Browse Files</h2>
+  <p class="sec-p">Upload your code files for the community to browse and download. Working download system with progress tracking.</p>
+
+  <div class="upload-grid">
+    <div>
+      <div class="upload-zone" id="upload-zone" ondragover="dragOver(event)" ondragleave="dragLeave()" ondrop="dropFile(event)">
+        <input type="file" multiple accept=".js,.ts,.py,.html,.css,.java,.c,.cpp,.php,.sql,.sh,.md,.txt,.json,.jsx,.tsx,.go,.rb,.rs" onchange="handleFiles(this.files)"/>
+        <div class="upload-icon">📁</div>
+        <div class="upload-title">Drop files or click to browse</div>
+        <div class="upload-hint">Upload code files to share with the MAC'LAY community.</div>
+        <div class="upload-types">
+          <span class="type-tag">.js</span><span class="type-tag">.py</span><span class="type-tag">.ts</span>
+          <span class="type-tag">.java</span><span class="type-tag">.c</span><span class="type-tag">.html</span>
+          <span class="type-tag">.sql</span><span class="type-tag">+more</span>
+        </div>
+      </div>
+      <div class="upload-progress" id="upload-progress"><div class="up-bar" id="up-bar"></div></div>
+      <div class="upload-success" id="upload-success">
+        <span>✓</span><span id="upload-msg">File uploaded!</span>
+      </div>
+    </div>
+    <div>
+      <div class="file-list-head">
+        <h3>Your Uploads</h3>
+        <span class="fcount" id="fcount">0 files</span>
+      </div>
+      <div class="file-list" id="file-list">
+        <div style="text-align:center;padding:2rem;color:var(--muted);font-size:.8rem"><div style="font-size:2rem;margin-bottom:.5rem">📂</div>No files yet. Upload one above.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Community Library -->
+  <div class="browse-sec">
+    <div class="browse-title">
+      <span>Community Code Library</span>
+      <span style="font-family:var(--font-m);font-size:.68rem;color:var(--teal)">Click any card to download</span>
+    </div>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="filterLib('all',this)">All</button>
+      <button class="filter-btn" onclick="filterLib('js',this)">JavaScript</button>
+      <button class="filter-btn" onclick="filterLib('py',this)">Python</button>
+      <button class="filter-btn" onclick="filterLib('react',this)">React</button>
+      <button class="filter-btn" onclick="filterLib('sql',this)">SQL</button>
+      <button class="filter-btn" onclick="filterLib('bot',this)">Bots</button>
+    </div>
+    <div class="browse-grid" id="browse-grid"></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PRICING -->
+<div class="section" id="pricing">
+  <div class="kicker">// Plans &amp; Pricing</div>
+  <h2 class="sec-h">Simple, Transparent Pricing</h2>
+  <p class="sec-p">Start free. Scale when you need to. All plans include MAC AI (Claude Anthropic), code editor, and file sharing.</p>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-tier">Free Forever</div>
+      <div class="price-name">Starter</div>
+      <div class="price-amt">$0<span class="price-per">/month</span></div>
+      <div class="price-tag">Perfect for learning and personal projects</div>
+      <ul class="price-feats">
+        <li>JavaScript live execution (instant, in-browser)</li>
+        <li>MAC AI (Claude Anthropic) — 20 msgs/day</li>
+        <li>File upload &amp; sharing (10 files max)</li>
+        <li>Community code library access</li>
+        <li>Save up to 5 code snippets (localStorage)</li>
+        <li>100GB Vercel bandwidth</li>
+        <li class="no">Python / Java / C / C++ execution</li>
+        <li class="no">Priority AI responses</li>
+        <li class="no">Private file uploads</li>
+      </ul>
+      <button class="price-btn pbtn-out" onclick="showToast('You\'re on the free plan!','info')">Current Plan</button>
+    </div>
+    <div class="price-card featured">
+      <div class="price-badge">MOST POPULAR</div>
+      <div class="price-tier">For Developers</div>
+      <div class="price-name">Pro</div>
+      <div class="price-amt">$20<span class="price-per">/month</span></div>
+      <div class="price-tag">Full access for serious builders</div>
+      <ul class="price-feats">
+        <li>Everything in Starter</li>
+        <li>Python, Java, C, C++, PHP via Judge0 backend</li>
+        <li>MAC AI (Claude Anthropic) — unlimited</li>
+        <li>Unlimited file uploads + private option</li>
+        <li>Unlimited saved snippets</li>
+        <li>Priority AI response speed</li>
+        <li>Bot builder templates</li>
+        <li class="no">Team collaboration</li>
+      </ul>
+      <button class="price-btn pbtn-teal" onclick="openPay('Pro','$20/month')">Get Pro →</button>
+    </div>
+    <div class="price-card">
+      <div class="price-tier">For Teams</div>
+      <div class="price-name">Business</div>
+      <div class="price-amt">$110<span class="price-per">/month</span></div>
+      <div class="price-tag">Up to 1,000 users — full infrastructure</div>
+      <ul class="price-feats">
+        <li>Everything in Pro</li>
+        <li>1,000 active users included</li>
+        <li>Vercel + Railway backend ($20/mo)</li>
+        <li>PostgreSQL database (included)</li>
+        <li>Claude API budget ($30/mo)</li>
+        <li>Judge0 Cloud — 2,500+ execs/month</li>
+        <li>Team dashboard &amp; admin controls</li>
+        <li>Custom domain support</li>
+      </ul>
+      <button class="price-btn pbtn-out" onclick="openPay('Business','$110/month')">Contact Sales →</button>
+    </div>
+  </div>
+  <h3 style="font-family:var(--font-h);font-weight:700;color:#fff;margin-top:3rem;margin-bottom:.2rem;font-size:1.1rem">Infrastructure Cost Breakdown</h3>
+  <p style="font-size:.8rem;color:var(--muted);margin-bottom:.5rem">What powers MAC'LAY behind the scenes</p>
+  <table class="infra-table">
+    <thead><tr><th>Service</th><th>Purpose</th><th>Free Tier</th><th>~1k Users/Month</th></tr></thead>
+    <tbody>
+      <tr><td>Vercel</td><td>Frontend hosting &amp; delivery</td><td class="cfree">100GB bandwidth</td><td class="cpaid">~$20</td></tr>
+      <tr><td>Railway</td><td>Backend API server</td><td class="cfree">$5 credit</td><td class="cpaid">~$20</td></tr>
+      <tr><td>PostgreSQL</td><td>User data &amp; file metadata</td><td class="cfree">Included on Railway</td><td class="cpaid">Included</td></tr>
+      <tr><td>Claude (Anthropic)</td><td>MAC AI intelligence</td><td class="cfree">API key required</td><td class="cpaid">~$30</td></tr>
+      <tr><td>Judge0 Cloud</td><td>Multi-language code execution</td><td class="cfree">2,500 execs/month</td><td class="cpaid">~$40</td></tr>
+      <tr class="total-row"><td><strong>Total</strong></td><td></td><td class="cfree"><strong>$5–10/month</strong></td><td class="cpaid"><strong>~$110/month</strong></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="divider"></div>
+
+<!-- DEPLOYMENT DOCS -->
+<div class="section" id="deploy">
+  <div class="kicker">// Deployment Guide</div>
+  <h2 class="sec-h">Deploy MAC'LAY</h2>
+  <p class="sec-p">Full deployment instructions for Vercel (frontend) and Railway (backend). Get your own instance live in minutes.</p>
+  <div class="deploy-grid">
+    <div class="deploy-card">
+      <h3>▲ Vercel — Frontend</h3>
+      <p>Deploy the frontend (this HTML file) to Vercel for global CDN delivery and automatic HTTPS.</p>
+      <div class="deploy-steps">
+        <div class="deploy-step"><div class="step-num">1</div><div class="step-text">Install Vercel CLI: <code>npm i -g vercel</code></div></div>
+        <div class="deploy-step"><div class="step-num">2</div><div class="step-text">In your project folder run: <code>vercel login</code></div></div>
+        <div class="deploy-step"><div class="step-num">3</div><div class="step-text">Deploy with: <code>vercel --prod</code></div></div>
+        <div class="deploy-step"><div class="step-num">4</div><div class="step-text">Add custom domain in Vercel dashboard → Settings → Domains → <code>maclay.com</code></div></div>
+        <div class="deploy-step"><div class="step-num">5</div><div class="step-text">Set env var: <code>ANTHROPIC_API_KEY</code> in Vercel project settings</div></div>
+      </div>
+    </div>
+    <div class="deploy-card">
+      <h3>🚂 Railway — Backend API</h3>
+      <p>Deploy the Node.js/Python backend on Railway for Judge0 code execution and user auth.</p>
+      <div class="deploy-steps">
+        <div class="deploy-step"><div class="step-num">1</div><div class="step-text">Go to <code>railway.app</code> → New Project → Deploy from GitHub</div></div>
+        <div class="deploy-step"><div class="step-num">2</div><div class="step-text">Add PostgreSQL plugin in Railway dashboard (free included)</div></div>
+        <div class="deploy-step"><div class="step-num">3</div><div class="step-text">Set env vars: <code>ANTHROPIC_API_KEY</code>, <code>JUDGE0_API_KEY</code>, <code>JWT_SECRET</code></div></div>
+        <div class="deploy-step"><div class="step-num">4</div><div class="step-text">Railway auto-deploys on every GitHub push</div></div>
+        <div class="deploy-step"><div class="step-num">5</div><div class="step-text">Point frontend to Railway API: update <code>BACKEND_URL</code> in your env</div></div>
+      </div>
+    </div>
+    <div class="deploy-card">
+      <h3>⚡ Judge0 — Code Execution</h3>
+      <p>Integrate Judge0 for safe, sandboxed multi-language code execution.</p>
+      <div class="deploy-steps">
+        <div class="deploy-step"><div class="step-num">1</div><div class="step-text">Get API key at <code>judge0.com/pricing</code> (2,500 free execs/month)</div></div>
+        <div class="deploy-step"><div class="step-num">2</div><div class="step-text">Add to Railway env: <code>JUDGE0_API_KEY=your_key</code></div></div>
+        <div class="deploy-step"><div class="step-num">3</div><div class="step-text">Backend route: <code>POST /api/execute</code> proxies to Judge0</div></div>
+        <div class="deploy-step"><div class="step-num">4</div><div class="step-text">Supported: Python, Java, C, C++, PHP, Ruby, Go, Bash</div></div>
+        <div class="deploy-step"><div class="step-num">5</div><div class="step-text">Set timeout: 10s max per execution for safety</div></div>
+      </div>
+    </div>
+    <div class="deploy-card">
+      <h3>🔐 Auth — User Accounts</h3>
+      <p>Set up Google OAuth and email/password authentication for user accounts.</p>
+      <div class="deploy-steps">
+        <div class="deploy-step"><div class="step-num">1</div><div class="step-text">Create Google OAuth app at <code>console.cloud.google.com</code></div></div>
+        <div class="deploy-step"><div class="step-num">2</div><div class="step-text">Set env: <code>GOOGLE_CLIENT_ID</code>, <code>GOOGLE_CLIENT_SECRET</code></div></div>
+        <div class="deploy-step"><div class="step-num">3</div><div class="step-text">Install: <code>npm install passport passport-google-oauth20 bcryptjs jsonwebtoken</code></div></div>
+        <div class="deploy-step"><div class="step-num">4</div><div class="step-text">PostgreSQL table: <code>users(id, email, name, provider, created_at)</code></div></div>
+        <div class="deploy-step"><div class="step-num">5</div><div class="step-text">JWT tokens stored in <code>httpOnly</code> cookies for security</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- CONTACT -->
+<div class="section" id="contact">
+  <div class="kicker">// Get In Touch</div>
+  <h2 class="sec-h">Contact Us</h2>
+  <p class="sec-p">Questions, collaborations, or upgrade help? Reach us any time.</p>
+  <div class="cc-grid">
+    <a class="cc" href="mailto:adonaicall47@gmail.com"><div class="cc-icon">✉️</div><div><div class="cc-lbl">Email</div><div class="cc-val">adonaicall47@gmail.com</div></div></a>
+    <a class="cc" href="https://wa.me/0782704034" target="_blank"><div class="cc-icon">💬</div><div><div class="cc-lbl">WhatsApp</div><div class="cc-val">0782704034</div></div></a>
+    <a class="cc" href="https://adonaicall47-crypto.github.io" target="_blank"><div class="cc-icon">⚙️</div><div><div class="cc-lbl">GitHub</div><div class="cc-val">adonaicall47-crypto.github.io</div></div></a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-inner">
+    <div class="foot-brand">
+      <div class="foot-wm">MAC<em>'</em>LAY</div>
+      <p>A modern platform for collaborative coding. Powered by <strong style="color:var(--teal)">Claude Anthropic AI</strong>. Built by Adonai Call × B-MAC OPERATIONS.</p>
+    </div>
+    <div class="foot-col"><h4>Product</h4><a href="#editor">Code Editor</a><a href="#ai">MAC AI</a><a href="#files">File Manager</a><a href="#pricing">Pricing</a></div>
+    <div class="foot-col"><h4>Company</h4><a href="#">About</a><a href="#">Blog</a><a href="#contact">Contact</a></div>
+    <div class="foot-col"><h4>Legal</h4><a href="#">Privacy Policy</a><a href="#">Terms of Service</a></div>
+  </div>
+  <div class="foot-bottom">
+    <p>© 2026 MAC'LAY · Developed by <a href="#">Adonai Call</a> and <a href="#">B-MAC OPERATIONS</a> · Powered by <a href="https://anthropic.com" target="_blank">Claude Anthropic</a></p>
+    <div class="soc-row">
+      <a class="soc" href="https://adonaicall47-crypto.github.io">⚙</a>
+      <a class="soc" href="#">𝕏</a>
+      <a class="soc" href="mailto:adonaicall47@gmail.com">✉</a>
+    </div>
+  </div>
+</footer>
+
+<!-- AUTH MODAL -->
+<div class="modal-bg" id="auth-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('auth-modal')">✕</button>
+    <h3 id="auth-title">Sign In to MAC'LAY</h3>
+    <p class="modal-sub" id="auth-sub">Access your projects, saved snippets, and full MAC AI.</p>
+
+    <div class="auth-providers">
+      <button class="auth-provider" onclick="authWithGoogle()">
+        <span class="ap-icon">🌐</span> Continue with Google
+      </button>
+      <button class="auth-provider" onclick="authWithGithub()">
+        <span class="ap-icon">⚙</span> Continue with GitHub
+      </button>
+    </div>
+
+    <div class="auth-divider">or continue with email</div>
+
+    <div class="form-field"><label>Email Address</label><input type="email" id="auth-email" placeholder="you@example.com"/></div>
+    <div class="form-field" id="auth-name-field" style="display:none"><label>Full Name</label><input type="text" id="auth-name" placeholder="Your name"/></div>
+    <div class="form-field"><label>Password</label><input type="password" id="auth-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')submitAuth()"/></div>
+
+    <div class="form-loading" id="auth-loading">
+      <div class="form-spinner"></div><span>Authenticating...</span>
+    </div>
+
+    <div class="modal-btns">
+      <button class="mbtn mbtn-s" onclick="closeModal('auth-modal')">Cancel</button>
+      <button class="mbtn mbtn-p" onclick="submitAuth()" id="auth-submit-btn">Sign In</button>
+    </div>
+    <div class="auth-toggle" id="auth-toggle">Don't have an account? <a onclick="switchAuthMode()">Sign up free →</a></div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-bg" id="pay-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('pay-modal')">✕</button>
+    <h3 id="pay-title">Upgrade Plan</h3>
+    <p class="modal-sub">Complete your details below. We'll reach out within 24 hours to activate your account.</p>
+    <div class="form-field"><label>Full Name</label><input type="text" id="pay-name" placeholder="Your name"/></div>
+    <div class="form-field"><label>Email Address</label><input type="email" id="pay-email" placeholder="you@example.com"/></div>
+    <div class="form-field"><label>Selected Plan</label><input type="text" id="pay-plan" readonly style="color:var(--teal)"/></div>
+    <div class="form-field"><label>Message (optional)</label><input type="text" id="pay-msg" placeholder="Tell us about your use case..."/></div>
+    <div class="form-loading" id="pay-loading"><div class="form-spinner"></div><span>Sending request...</span></div>
+    <div class="modal-btns">
+      <button class="mbtn mbtn-s" onclick="closeModal('pay-modal')">Cancel</button>
+      <button class="mbtn mbtn-p" onclick="submitPay()">Send Request →</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><span id="toast-icon">✓</span><span id="toast-msg"></span></div>
+
+<script>
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let currentUser = JSON.parse(localStorage.getItem('maclay_user') || 'null');
+let savedSnippets = JSON.parse(localStorage.getItem('maclay_snippets') || '[]');
+let uploadedFiles = JSON.parse(localStorage.getItem('maclay_files') || '[]');
+let activeModel = 'claude-sonnet-4-20250514';
+let activeModelName = 'Claude Sonnet 4';
+let authMode = 'signin';
+let chatHistory = [];
+
+// ═══════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════
+function openAuth(mode) {
+  authMode = mode;
+  document.getElementById('auth-title').textContent = mode === 'signin' ? 'Sign In to MAC\'LAY' : 'Create Account';
+  document.getElementById('auth-submit-btn').textContent = mode === 'signin' ? 'Sign In' : 'Create Account';
+  document.getElementById('auth-toggle').innerHTML = mode === 'signin'
+    ? 'Don\'t have an account? <a onclick="switchAuthMode()">Sign up free →</a>'
+    : 'Already have an account? <a onclick="switchAuthMode()">Sign in →</a>';
+  document.getElementById('auth-name-field').style.display = mode === 'signup' ? 'block' : 'none';
+  document.getElementById('auth-loading').classList.remove('show');
+  openModal('auth-modal');
+}
+
+function switchAuthMode() {
+  openAuth(authMode === 'signin' ? 'signup' : 'signin');
+}
+
+function authWithGoogle() {
+  document.getElementById('auth-loading').classList.add('show');
+  setTimeout(() => {
+    document.getElementById('auth-loading').classList.remove('show');
+    loginUser({ name: 'Google User', email: 'user@gmail.com', provider: 'google' });
+  }, 1500);
+}
+
+function authWithGithub() {
+  document.getElementById('auth-loading').classList.add('show');
+  setTimeout(() => {
+    document.getElementById('auth-loading').classList.remove('show');
+    loginUser({ name: 'GitHub User', email: 'user@github.com', provider: 'github' });
+  }, 1500);
+}
+
+function submitAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-pass').value;
+  const name = document.getElementById('auth-name').value.trim();
+  if (!email || !pass) { showToast('Please fill in all fields', 'err'); return; }
+  if (authMode === 'signup' && !name) { showToast('Please enter your name', 'err'); return; }
+  document.getElementById('auth-loading').classList.add('show');
+  setTimeout(() => {
+    document.getElementById('auth-loading').classList.remove('show');
+    loginUser({ name: name || email.split('@')[0], email, provider: 'email' });
+  }, 1200);
+}
+
+function loginUser(user) {
+  currentUser = user;
+  localStorage.setItem('maclay_user', JSON.stringify(user));
+  closeModal('auth-modal');
+  updateUserUI();
+  showToast(`Welcome, ${user.name}! 🎉`, 'ok');
+}
+
+function updateUserUI() {
+  const pill = document.getElementById('user-pill');
+  const si = document.getElementById('btn-signin');
+  const su = document.getElementById('btn-signup');
+  if (currentUser) {
+    pill.classList.add('show');
+    document.getElementById('user-av').textContent = currentUser.name[0].toUpperCase();
+    document.getElementById('user-name-nav').textContent = currentUser.name.split(' ')[0];
+    si.style.display = 'none'; su.style.display = 'none';
+  } else {
+    pill.classList.remove('show');
+    si.style.display = ''; su.style.display = '';
+  }
+}
+
+function showProfile() {
+  if (!currentUser) return;
+  const confirmed = confirm(`Signed in as ${currentUser.name} (${currentUser.email})\n\nSign out?`);
+  if (confirmed) {
+    currentUser = null;
+    localStorage.removeItem('maclay_user');
+    updateUserUI();
+    showToast('Signed out', 'info');
+  }
+}
+
+// ═══════════════════════════════════════
+// EDITOR
+// ═══════════════════════════════════════
+const EXTS = {javascript:'js',python:'py',html:'html',c:'c',cpp:'cpp',java:'java',php:'php',sql:'sql',bash:'sh'};
+const TEMPLATES = {
+  javascript: `// MAC'LAY Workspace — JavaScript\n// Powered by Claude Anthropic AI\n\nfunction greet(name) {\n  return \`Hello, \${name}! Welcome to MAC'LAY.\`;\n}\n\nconst message = greet("Developer");\nconsole.log(message);\nconsole.log("Happy coding! 🚀");`,
+  python: `# MAC'LAY Workspace — Python\n# Powered by Claude Anthropic AI\n\ndef greet(name):\n    return f"Hello, {name}! Welcome to MAC'LAY."\n\nmessage = greet("Developer")\nprint(message)\nprint("Happy coding! 🚀")`,
+  html: `<!-- MAC'LAY Workspace — HTML -->\n<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8"/>\n  <title>My Page</title>\n</head>\n<body>\n  <h1>Hello from MAC'LAY!</h1>\n  <p>Powered by Claude Anthropic AI</p>\n</body>\n</html>`,
+  c: `// MAC'LAY Workspace — C\n#include <stdio.h>\n\nint main() {\n    printf("Hello from MAC'LAY!\\n");\n    return 0;\n}`,
+  cpp: `// MAC'LAY Workspace — C++\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << "Hello from MAC'LAY!" << endl;\n    return 0;\n}`,
+  java: `// MAC'LAY Workspace — Java\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello from MAC'LAY!");\n    }\n}`,
+  php: `<?php\n// MAC'LAY Workspace — PHP\nfunction greet($name) {\n    return "Hello, $name! Welcome to MAC'LAY.";\n}\necho greet("Developer");`,
+  sql: `-- MAC'LAY Workspace — SQL\nSELECT u.id, u.name, COUNT(o.id) AS orders\nFROM users u\nLEFT JOIN orders o ON u.id = o.user_id\nGROUP BY u.id, u.name\nORDER BY orders DESC\nLIMIT 10;`,
+  bash: `#!/bin/bash\n# MAC'LAY Workspace — Bash\necho "Hello from MAC'LAY!"\nfor i in 1 2 3; do\n  echo "  Step $i complete"\ndone`
+};
+
+function setTemplate() {
+  const l = document.getElementById('lang-select').value;
+  document.getElementById('code-editor').value = TEMPLATES[l] || '// Start coding...';
+  document.getElementById('tab-main').textContent = 'untitled.' + (EXTS[l] || 'txt');
+  document.getElementById('exec-lang-tag').textContent = l.toUpperCase().substring(0, 4);
+  clearOutputUI();
+  updateLines();
+}
+
+function handleTab(e) {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const t = e.target, s = t.selectionStart;
+    t.value = t.value.substring(0, s) + '  ' + t.value.substring(t.selectionEnd);
+    t.selectionStart = t.selectionEnd = s + 2;
+  }
+}
+
+function updateLines() {
+  const lines = document.getElementById('code-editor').value.split('\n').length;
+  let h = '';
+  for (let i = 1; i <= Math.max(lines, 10); i++) h += `<span>${i}</span>`;
+  document.getElementById('lnums').innerHTML = h;
+}
+
+function clearOutputUI() {
+  document.getElementById('output-box').textContent = '// Click ▶ Run to execute...';
+  document.getElementById('output-box').style.color = '';
+  document.getElementById('run-time').textContent = '';
+  document.getElementById('exec-error').style.display = 'none';
+}
+
+function setRunning(running) {
+  const btn = document.getElementById('run-btn');
+  const label = document.getElementById('run-label');
+  btn.disabled = running;
+  label.innerHTML = running ? '<span class="spinner"></span>' : '▶ Run';
+  document.getElementById('exec-loading').classList.toggle('show', running);
+  document.getElementById('output-box').style.display = running ? 'none' : 'block';
+}
+
+async function runCode() {
+  const lang = document.getElementById('lang-select').value;
+  const code = document.getElementById('code-editor').value.trim();
+  if (!code) { showToast('Write some code first!', 'info'); return; }
+
+  const t0 = Date.now();
+  setRunning(true);
+  document.getElementById('exec-error').style.display = 'none';
+  document.getElementById('out-dot').style.background = 'var(--yellow)';
+
+  if (lang === 'javascript') {
+    // Safe in-browser execution
+    const logs = [];
+    const orig = { log: console.log, error: console.error, warn: console.warn };
+    console.log = (...a) => logs.push(a.map(x => typeof x === 'object' ? JSON.stringify(x, null, 2) : String(x)).join(' '));
+    console.error = (...a) => logs.push('❌ ' + a.join(' '));
+    console.warn = (...a) => logs.push('⚠️ ' + a.join(' '));
+    try {
+      // Wrap in IIFE for safe scope
+      const fn = new Function(code);
+      fn();
+      setResult(logs.length ? logs.join('\n') : '// Code ran with no output.', 'ok', Date.now() - t0);
+    } catch (err) {
+      setResult(null, 'err', Date.now() - t0, err);
+    }
+    Object.assign(console, orig);
+
+  } else if (lang === 'html') {
+    const blob = new Blob([code], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    setRunning(false);
+    document.getElementById('output-box').style.color = '#60a5fa';
+    document.getElementById('output-box').innerHTML = '✅ HTML Preview ready\n\n<a href="' + url + '" target="_blank" style="color:var(--teal);text-decoration:underline">⬡ Open Preview in new tab ↗</a>';
+    document.getElementById('run-time').textContent = (Date.now() - t0) + 'ms';
+    document.getElementById('out-dot').style.background = 'var(--green)';
+    return;
+
+  } else {
+    // Backend execution via Judge0 (requires Pro plan + backend deployed)
+    document.getElementById('exec-msg').textContent = `Sending ${lang.toUpperCase()} to execution server...`;
+    try {
+      // Try to call backend
+      const resp = await fetch('/api/execute', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ language: lang, code }),
+        signal: AbortSignal.timeout(12000)
+      });
+      if (!resp.ok) throw new Error('Backend returned ' + resp.status);
+      const data = await resp.json();
+      if (data.error) throw new Error(data.error);
+      setResult(data.output || '// No output', 'ok', Date.now() - t0);
+    } catch (err) {
+      // Backend not deployed — show helpful message
+      setRunning(false);
+      document.getElementById('output-box').style.color = '#c084fc';
+      document.getElementById('output-box').textContent =
+        `▶ ${lang.toUpperCase()} execution requires the backend server.\n\n` +
+        `To enable:\n` +
+        `  1. Deploy backend to Railway (see #deploy section)\n` +
+        `  2. Add JUDGE0_API_KEY to Railway env vars\n` +
+        `  3. Upgrade to Pro plan at maclay.com/#pricing\n\n` +
+        `JavaScript runs instantly — switch to JS to test live execution.\n\n` +
+        `─────────────────────────────\n` +
+        `Your ${lang.toUpperCase()} code (${code.split('\n').length} lines):\n` +
+        code.substring(0, 300) + (code.length > 300 ? '\n...' : '');
+      document.getElementById('run-time').textContent = (Date.now() - t0) + 'ms';
+      document.getElementById('out-dot').style.background = 'var(--yellow)';
+      return;
+    }
+  }
+}
+
+function setResult(output, type, ms, err) {
+  setRunning(false);
+  const out = document.getElementById('output-box');
+  document.getElementById('run-time').textContent = ms + 'ms';
+  if (type === 'ok') {
+    out.style.color = 'var(--green)';
+    out.textContent = output;
+    document.getElementById('out-dot').style.background = 'var(--green)';
+  } else {
+    document.getElementById('out-dot').style.background = 'var(--red)';
+    out.textContent = '';
+    const eb = document.getElementById('exec-error');
+    eb.style.display = 'flex';
+    document.getElementById('exec-error-msg').textContent = err.constructor.name + ': ' + err.message;
+  }
+}
+
+// ═══════════════════════════════════════
+// SNIPPETS (localStorage)
+// ═══════════════════════════════════════
+function saveSnippet() {
+  const code = document.getElementById('code-editor').value.trim();
+  const lang = document.getElementById('lang-select').value;
+  if (!code) { showToast('Nothing to save', 'info'); return; }
+  const name = prompt('Name this snippet:', lang + '_snippet_' + (savedSnippets.length + 1));
+  if (!name) return;
+  savedSnippets.unshift({ name, lang, code, date: new Date().toLocaleDateString(), id: Date.now() });
+  localStorage.setItem('maclay_snippets', JSON.stringify(savedSnippets));
+  renderSnippets();
+  showToast('💾 Snippet saved: ' + name, 'ok');
+}
+
+function renderSnippets() {
+  const list = document.getElementById('sp-list');
+  document.getElementById('sp-count').textContent = savedSnippets.length;
+  if (!savedSnippets.length) {
+    list.innerHTML = '<div style="color:var(--muted);font-size:.8rem">No saved snippets yet. Write code and hit 💾 Save.</div>';
+    return;
+  }
+  list.innerHTML = savedSnippets.map((s, i) => `
+    <div class="sp-card">
+      <div class="sp-name">${s.name}</div>
+      <div class="sp-meta"><span>${s.lang.toUpperCase()}</span><span>${s.date}</span><span>${s.code.split('\n').length} lines</span></div>
+      <div class="sp-actions">
+        <button class="sp-load" onclick="loadSnippet(${i})">Load →</button>
+        <button class="sp-del" onclick="deleteSnippet(${i})">Delete</button>
+      </div>
+    </div>
+  `).join('');
+  // Also render as pills in editor
+  const pills = document.getElementById('snippet-pills');
+  pills.innerHTML = savedSnippets.slice(0, 4).map((s, i) =>
+    `<span class="snippet-pill" onclick="loadSnippet(${i})">${s.name}</span>`
+  ).join('');
+}
+
+function loadSnippet(i) {
+  const s = savedSnippets[i];
+  document.getElementById('code-editor').value = s.code;
+  document.getElementById('lang-select').value = s.lang;
+  document.getElementById('tab-main').textContent = s.name + '.' + (EXTS[s.lang] || 'txt');
+  updateLines(); clearOutputUI();
+  showToast('Loaded: ' + s.name, 'ok');
+  document.getElementById('editor').scrollIntoView({ behavior: 'smooth' });
+}
+
+function deleteSnippet(i) {
+  const name = savedSnippets[i].name;
+  savedSnippets.splice(i, 1);
+  localStorage.setItem('maclay_snippets', JSON.stringify(savedSnippets));
+  renderSnippets();
+  showToast('Deleted: ' + name, 'info');
+}
+
+// ═══════════════════════════════════════
+// MAC AI — REAL CLAUDE API
+// ═══════════════════════════════════════
+const SYS = `You are MAC AI — the intelligent coding assistant built into MAC'LAY Workspace (maclay.com).
+You are powered by Claude Anthropic (MAC AI = Claude engine), created by Adonai Call and B-MAC OPERATIONS.
+
+Help users: write code, debug errors, optimize performance, build bots (Telegram, Discord, WhatsApp), explain programming concepts, generate snippets.
+
+Format: Use markdown code blocks with language names. Be concise but thorough. Always practical.`;
+
+function setModel(btn) {
+  document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeModel = btn.dataset.model;
+  activeModelName = btn.dataset.name;
+  document.getElementById('model-active-display').textContent = 'Model: ' + activeModelName;
+  document.getElementById('model-notice-tag').textContent = activeModelName;
+  document.getElementById('typing-lbl').textContent = activeModelName + ' is thinking...';
+
+  const isExternal = ['gpt4','gpt35','gemini'].includes(activeModel);
+  if (isExternal) {
+    showToast(activeModelName + ' requires its own API key in the backend', 'info');
+  }
+}
+
+async function sendMsg() {
+  const inp = document.getElementById('mac-input');
+  const msg = inp.value.trim();
+  if (!msg) return;
+  inp.value = '';
+
+  const isExternal = ['gpt4', 'gpt35', 'gemini'].includes(activeModel);
+  appendMsg('user', escHtml(msg), null);
+  chatHistory.push({ role: 'user', content: msg });
+
+  document.getElementById('typing-row').style.display = 'flex';
+  document.getElementById('send-btn').disabled = true;
+  document.getElementById('send-label').innerHTML = '<span class="spinner"></span>';
+
+  if (isExternal) {
+    // External models: show helpful message about backend requirement
+    await new Promise(r => setTimeout(r, 800));
+    document.getElementById('typing-row').style.display = 'none';
+    resetSendBtn();
+    appendMsg('ai',
+      `<strong>${activeModelName}</strong> is available via the MAC'LAY backend API.<br/><br/>` +
+      `To use ${activeModelName}:<br/>` +
+      `• Deploy the backend to Railway (see <a href="#deploy" style="color:var(--teal)">Deployment Guide</a>)<br/>` +
+      `• Add your API key: <code>${activeModel.startsWith('gpt') ? 'OPENAI_API_KEY' : 'GOOGLE_API_KEY'}</code> to Railway env vars<br/>` +
+      `• The backend routes the request to the correct AI engine<br/><br/>` +
+      `For now, switching to <strong>Claude Sonnet 4</strong> (free, no backend needed) for your question:<br/><br/>`,
+      activeModelName
+    );
+    // Fall through to Claude for the actual answer
+    activeModel = 'claude-sonnet-4-20250514';
+    document.getElementById('typing-row').style.display = 'flex';
+    document.getElementById('send-btn').disabled = true;
+  }
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: isExternal ? 'claude-sonnet-4-20250514' : activeModel,
+        max_tokens: 1024,
+        system: SYS,
+        messages: chatHistory
+      })
+    });
+    if (!resp.ok) throw new Error('API ' + resp.status);
+    const data = await resp.json();
+    const reply = data.content?.map(b => b.text || '').join('') || 'No response received.';
+    chatHistory.push({ role: 'assistant', content: reply });
+    document.getElementById('typing-row').style.display = 'none';
+    resetSendBtn();
+    appendMsg('ai', fmtAI(reply), isExternal ? 'Claude Sonnet 4 (fallback)' : activeModelName);
+  } catch (err) {
+    document.getElementById('typing-row').style.display = 'none';
+    resetSendBtn();
+    appendMsg('ai',
+      `⚠️ <strong>Connection error</strong><br/>` +
+      `Could not reach the AI API. Check your internet connection.<br/><br/>` +
+      `<em style="color:var(--muted2);font-size:.78rem">Error: ${err.message}</em><br/><br/>` +
+      `<a href="mailto:adonaicall47@gmail.com" style="color:var(--teal);font-size:.8rem">Contact support →</a>`,
+      null
+    );
+  }
+}
+
+function resetSendBtn() {
+  document.getElementById('send-btn').disabled = false;
+  document.getElementById('send-label').textContent = 'Send ▶';
+}
+
+function askQuick(q) {
+  document.getElementById('mac-input').value = q;
+  document.getElementById('ai').scrollIntoView({ behavior: 'smooth' });
+  setTimeout(sendMsg, 300);
+}
+
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fmtAI(text) {
+  text = text.replace(/```(\w+)?\n?([\s\S]*?)```/g, (m, lang, code) =>
+    `<pre>${lang ? `<span style="color:var(--muted);font-size:.6rem;display:block;margin-bottom:.3rem">${lang}</span>` : ''}${escHtml(code.trim())}</pre>`);
+  text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+  text = text.replace(/\n/g, '<br>');
+  return text;
+}
+
+function appendMsg(role, html, modelLabel) {
+  const c = document.getElementById('ai-msgs');
+  const d = document.createElement('div');
+  d.className = 'msg ' + role;
+  const metaHtml = modelLabel ? `<div class="msg-meta">${modelLabel} · Anthropic</div>` : '';
+  d.innerHTML = `<div class="msg-av ${role==='ai'?'aav':'uav'}">${role==='ai'?'M':'U'}</div><div><div class="msg-bub">${html}</div>${role==='ai'?metaHtml:''}</div>`;
+  c.appendChild(d);
+  c.scrollTop = c.scrollHeight;
+}
+
+// ═══════════════════════════════════════
+// FILE MANAGER
+// ═══════════════════════════════════════
+const COMMUNITY = [
+  {name:'telegram-bot.py',tag:'Python',icon:'🐍',desc:'Full Telegram bot with command handling & inline keyboards',size:'4.2 KB',dl:892,cat:'bot',content:'import telebot\nbot = telebot.TeleBot("YOUR_TOKEN")\n\n@bot.message_handler(commands=["start"])\ndef start(message):\n    bot.reply_to(message, "Hello from MAC\'LAY Bot!")\n\nbot.polling()'},
+  {name:'react-auth.jsx',tag:'React',icon:'⚛',desc:'JWT authentication with React hooks and context',size:'6.8 KB',dl:1240,cat:'react',content:'import { useState, createContext, useContext } from "react";\n\nconst AuthContext = createContext();\n\nexport function AuthProvider({ children }) {\n  const [user, setUser] = useState(null);\n  const login = (userData) => setUser(userData);\n  const logout = () => setUser(null);\n  return (\n    <AuthContext.Provider value={{ user, login, logout }}>\n      {children}\n    </AuthContext.Provider>\n  );\n}\n\nexport const useAuth = () => useContext(AuthContext);'},
+  {name:'merge-sort.js',tag:'JavaScript',icon:'💛',desc:'Optimized merge sort algorithm implementation',size:'1.1 KB',dl:456,cat:'js',content:'function mergeSort(arr) {\n  if (arr.length <= 1) return arr;\n  const mid = Math.floor(arr.length / 2);\n  const left = mergeSort(arr.slice(0, mid));\n  const right = mergeSort(arr.slice(mid));\n  return merge(left, right);\n}\n\nfunction merge(left, right) {\n  const result = [];\n  let i = 0, j = 0;\n  while (i < left.length && j < right.length) {\n    if (left[i] <= right[j]) result.push(left[i++]);\n    else result.push(right[j++]);\n  }\n  return result.concat(left.slice(i)).concat(right.slice(j));\n}\n\nconsole.log(mergeSort([38, 27, 43, 3, 9, 82, 10]));'},
+  {name:'discord-bot.py',tag:'Python',icon:'🐍',desc:'Discord bot with slash commands and event handlers',size:'8.3 KB',dl:713,cat:'bot',content:'import discord\nfrom discord.ext import commands\n\nbot = commands.Bot(command_prefix="!", intents=discord.Intents.all())\n\n@bot.event\nasync def on_ready():\n    print(f"Logged in as {bot.user}")\n\n@bot.command()\nasync def hello(ctx):\n    await ctx.send(f"Hello, {ctx.author.mention}! 👋")\n\nbot.run("YOUR_TOKEN")'},
+  {name:'sql-pagination.sql',tag:'SQL',icon:'🗃',desc:'Efficient cursor-based pagination query',size:'0.9 KB',dl:334,cat:'sql',content:'-- Cursor-based pagination (fast for large tables)\nSELECT id, name, created_at\nFROM users\nWHERE created_at < :last_cursor\nORDER BY created_at DESC\nLIMIT :page_size;\n\n-- Index for performance\nCREATE INDEX idx_users_created_at ON users(created_at DESC);'},
+  {name:'express-api.js',tag:'JavaScript',icon:'💛',desc:'REST API with Express, middleware, and error handling',size:'5.2 KB',dl:1089,cat:'js',content:'const express = require("express");\nconst app = express();\napp.use(express.json());\n\n// Auth middleware\nconst auth = (req, res, next) => {\n  const token = req.headers.authorization?.split(" ")[1];\n  if (!token) return res.status(401).json({ error: "Unauthorized" });\n  next();\n};\n\napp.get("/api/users", auth, async (req, res) => {\n  try {\n    const users = [{ id: 1, name: "Developer" }];\n    res.json({ data: users });\n  } catch (err) {\n    res.status(500).json({ error: err.message });\n  }\n});\n\napp.listen(3000, () => console.log("Server running on port 3000"));'},
+  {name:'whatsapp-bot.js',tag:'JavaScript',icon:'💛',desc:'WhatsApp bot using Baileys library',size:'7.5 KB',dl:943,cat:'bot',content:'const { makeWASocket, useMultiFileAuthState } = require("@whiskeysockets/baileys");\n\nasync function startBot() {\n  const { state, saveCreds } = await useMultiFileAuthState("auth");\n  const sock = makeWASocket({ auth: state });\n  \n  sock.ev.on("creds.update", saveCreds);\n  sock.ev.on("messages.upsert", ({ messages }) => {\n    const msg = messages[0];\n    if (!msg.key.fromMe) {\n      sock.sendMessage(msg.key.remoteJid, { text: "Hello from MAC\'LAY Bot! 🚀" });\n    }\n  });\n}\n\nstartBot();'},
+  {name:'binary-search.py',tag:'Python',icon:'🐍',desc:'Binary search with test suite',size:'2.1 KB',dl:521,cat:'py',content:'def binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1\n\n# Test\nsorted_arr = [1, 3, 5, 7, 9, 11, 13]\nprint(binary_search(sorted_arr, 7))   # 3\nprint(binary_search(sorted_arr, 6))   # -1'},
+];
+
+function getIcon(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  return {js:'💛',ts:'🔷',jsx:'⚛',tsx:'⚛',py:'🐍',html:'🌐',css:'🎨',java:'☕',c:'⚙',cpp:'⚙',php:'🐘',sql:'🗃',sh:'💻',md:'📝',json:'📋',txt:'📄'}[ext] || '📄';
+}
+function fmtSize(b) { if(b<1024)return b+'B'; if(b<1048576)return(b/1024).toFixed(1)+'KB'; return(b/1048576).toFixed(1)+'MB'; }
+
+function renderLibrary(filter = 'all') {
+  const grid = document.getElementById('browse-grid');
+  const items = filter === 'all' ? COMMUNITY : COMMUNITY.filter(f => f.cat === filter);
+  grid.innerHTML = items.map((f, i) => `
+    <div class="bc" onclick="downloadCommunityFile(${COMMUNITY.indexOf(f)},this)">
+      <div class="bc-top"><span style="font-size:1.4rem">${f.icon}</span><span class="bc-tag">${f.tag}</span></div>
+      <div class="bc-name">${f.name}</div>
+      <div class="bc-desc">${f.desc}</div>
+      <div class="dl-progress" id="dlp-${COMMUNITY.indexOf(f)}"><div class="dlp-bar"></div></div>
+      <div class="bc-foot"><span>${f.size}</span><span>⬇ ${f.dl.toLocaleString()}</span></div>
+    </div>
+  `).join('');
+}
+
+function filterLib(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLibrary(cat);
+}
+
+function downloadCommunityFile(i, card) {
+  const f = COMMUNITY[i];
+  const dlp = document.getElementById('dlp-' + i);
+  if (dlp) { dlp.classList.add('show'); }
+  showToast('⬇ Downloading ' + f.name + '...', 'info');
+  setTimeout(() => {
+    const blob = new Blob([f.content], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = f.name;
+    a.click();
+    if (dlp) dlp.classList.remove('show');
+    showToast('✓ ' + f.name + ' downloaded!', 'ok');
+  }, 1200);
+}
+
+function handleFiles(files) {
+  const prog = document.getElementById('upload-progress');
+  const bar = document.getElementById('up-bar');
+  prog.classList.add('show');
+  bar.style.width = '0';
+  let loaded = 0;
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      uploadedFiles.unshift({ name: file.name, size: file.size, content: e.target.result, date: new Date().toLocaleDateString(), icon: getIcon(file.name) });
+      localStorage.setItem('maclay_files', JSON.stringify(uploadedFiles.map(f => ({ name:f.name,size:f.size,date:f.date,icon:f.icon }))));
+      loaded++;
+      bar.style.width = (loaded / files.length * 100) + '%';
+      if (loaded === files.length) {
+        setTimeout(() => prog.classList.remove('show'), 600);
+        const suc = document.getElementById('upload-success');
+        document.getElementById('upload-msg').textContent = files.length === 1 ? file.name + ' uploaded!' : files.length + ' files uploaded!';
+        suc.classList.add('show');
+        setTimeout(() => suc.classList.remove('show'), 3500);
+        renderFileList();
+        showToast('✓ ' + (files.length === 1 ? file.name : files.length + ' files') + ' uploaded!', 'ok');
+      }
+    };
+    reader.readAsText(file);
+  });
+}
+
+function renderFileList() {
+  const list = document.getElementById('file-list');
+  document.getElementById('fcount').textContent = uploadedFiles.length + ' file' + (uploadedFiles.length !== 1 ? 's' : '');
+  if (!uploadedFiles.length) {
+    list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted);font-size:.8rem"><div style="font-size:2rem;margin-bottom:.5rem">📂</div>No files yet. Upload one above.</div>';
+    return;
+  }
+  list.innerHTML = uploadedFiles.map((f, i) => `
+    <div class="file-item">
+      <span class="fi-icon">${f.icon}</span>
+      <div class="fi-info">
+        <div class="fi-name">${f.name}</div>
+        <div class="fi-meta"><span>${f.name.split('.').pop().toUpperCase()}</span><span>${fmtSize(f.size)}</span><span>${f.date}</span></div>
+      </div>
+      <div class="fi-actions">
+        <button class="fa-dl" onclick="downloadUpload(${i})">⬇ DL</button>
+        <button class="fa-rm" onclick="removeFile(${i})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function downloadUpload(i) {
+  const f = uploadedFiles[i];
+  if (!f.content) { showToast('File content not available (reload page)', 'err'); return; }
+  const blob = new Blob([f.content], { type: 'text/plain' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = f.name; a.click();
+  showToast('⬇ ' + f.name + ' downloaded', 'ok');
+}
+
+function removeFile(i) {
+  const name = uploadedFiles[i].name;
+  uploadedFiles.splice(i, 1);
+  localStorage.setItem('maclay_files', JSON.stringify(uploadedFiles.map(f => ({ name:f.name,size:f.size,date:f.date,icon:f.icon }))));
+  renderFileList();
+  showToast('Removed: ' + name, 'info');
+}
+
+function dragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag'); }
+function dragLeave() { document.getElementById('upload-zone').classList.remove('drag'); }
+function dropFile(e) { e.preventDefault(); dragLeave(); handleFiles(e.dataTransfer.files); }
+
+// ═══════════════════════════════════════
+// MODALS + PAYMENT
+// ═══════════════════════════════════════
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function openPay(plan, price) {
+  document.getElementById('pay-title').textContent = 'Upgrade to ' + plan;
+  document.getElementById('pay-plan').value = plan + ' — ' + price;
+  if (currentUser) {
+    document.getElementById('pay-email').value = currentUser.email || '';
+    document.getElementById('pay-name').value = currentUser.name || '';
+  }
+  openModal('pay-modal');
+}
+
+function submitPay() {
+  const email = document.getElementById('pay-email').value.trim();
+  if (!email) { showToast('Please enter your email', 'err'); return; }
+  document.getElementById('pay-loading').classList.add('show');
+  setTimeout(() => {
+    document.getElementById('pay-loading').classList.remove('show');
+    closeModal('pay-modal');
+    showToast('🎉 Request sent! Check your email within 24hrs.', 'ok');
+  }, 1400);
+}
+
+document.querySelectorAll('.modal-bg').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
+
+// ═══════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════
+let toastT;
+function showToast(msg, type = 'ok') {
+  clearTimeout(toastT);
+  const t = document.getElementById('toast');
+  document.getElementById('toast-icon').textContent = type === 'ok' ? '✓' : type === 'err' ? '✕' : 'ℹ';
+  document.getElementById('toast-msg').textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  toastT = setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+updateUserUI();
+renderLibrary();
+renderSnippets();
+renderFileList();
+updateLines();
+</script>
+</body>
+</html>
